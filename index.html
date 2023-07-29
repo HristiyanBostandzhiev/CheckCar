@@ -15,7 +15,7 @@
 		<br>
         <form id="checkForm">
             <label for="plate">Регистрационен номер</label>
-            <input type="text" placeholder="A0001BA" name="plate" id="plate" required pattern="[а-яА-Яa-zA-Z0-9]+">
+			<input type="text" placeholder="A0001BA" name="plate" id="plate" required pattern="[а-яА-Яa-zA-Z0-9]+" title="Позволени са само кирилица, латиница и числа.">
             <button type="submit">Провери</button>
         </form>
         <div class="result" id="resultDiv">
