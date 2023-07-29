@@ -1,0 +1,49 @@
+/* Общ стил на страницата */
+body {
+    background-color: darkgray;
+    color: whitesmoke;
+    font-family: Arial, sans-serif;
+}
+
+/* Стил на контейнера */
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Стил на формата */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+label {
+    margin-bottom: 10px;
+}
+
+input[type="text"] {
+    padding: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+button[type="submit"] {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Стил на резултатите */
+.result {
+    margin-top: 20px;
+}
+
+/* Стил на грешките */
+.error {
+    color: red;
+}
