@@ -24,14 +24,26 @@ label {
     margin-bottom: 10px;
 }
 
+/* Стилове за текстовото поле */
 input[type="text"] {
-    padding: 8px;
+    max-width: 150px;
+	padding: 8px;
     width: 100%;
     margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 13px; /* Добавяне на заоблени ъгли */
+    outline: none; /* Премахване на контур при фокусиране */
+}
+
+/* Стилове за фокусираното текстово поле */
+input[type="text"]:focus {
+    box-shadow: 0 0 5px #00f; /* Добавяне на сянка при фокус */
 }
 
 button[type="submit"] {
-    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+	padding: 8px 15px;
     background-color: #007bff;
     color: white;
     border: none;
