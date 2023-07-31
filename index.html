@@ -50,52 +50,70 @@
 
             // Заявка към първото API - гражданска отговорност
             var payload1 = { email: email, plate: plateNumber };
-            get_data_from_api('https://myve.bg:4402/check/get/zastrahovka', payload1)
-                .then(function(response1) {
-                    var resultHtml = '';
-                    if (response1.data === "no info") {
-                        resultHtml += '<p>Гражданска отговорност до: Няма валидна гражданска отговорност</p>';
+get_data_from_api('https://myve.bg:4402/check/get/zastrahovka', payload1)
+    .then(function(response1) {
+        var resultHtml = '';
+        if (response1.data === "no info") {
+            resultHtml += '<h3>Гражданска отговорност</h3>';
+            resultHtml += '<p>Няма валидна гражданска отговорност</p>';
+        } else {
+            var big_data = response1.data.big_data || [];
+            if (big_data.length > 0) {
+                resultHtml += '<h3>Гражданска отговорност</h3>';
+                for (var i = 0; i < big_data.length; i++) {
+                    var insuranceCompany = big_data[i][0];
+                    var validFrom = big_data[i][1];
+                    var validTo = big_data[i][2];
+
+                    resultHtml += '<p>Застрахователна компания: ' + insuranceCompany + '</p>';
+                    resultHtml += '<p>Валидна от: ' + validFrom + '</p>';
+                    resultHtml += '<p>Валидна до: ' + validTo + '</p>';
+                    resultHtml += '<hr>';
+                }
+            } else {
+                resultHtml += '<h3>Гражданска отговорност</h3>';
+                resultHtml += '<p>Няма информация за гражданска отговорност</p>';
+				resultHtml += '<hr>';
+            }
+        }
+
+        // Заявка към второто API - технически преглед
+        var payload2 = { email: email, plate: plateNumber };
+        return get_data_from_api('https://myve.bg:4402/check/get/gtp', payload2)
+            .then(function(response2) {
+                if (response2.data) {
+                    var technical_inspection_data = response2.data;
+                    var valid_to_match = /валиден до\n\n(\d{2}\.\d{2}\.\d{4})/.exec(technical_inspection_data);
+                    var valid_to = valid_to_match ? valid_to_match[1] : null;
+                    resultHtml += '<h3>Технически преглед</h3>';
+                    if (valid_to) {
+                        resultHtml += '<p>Технически преглед до: ' + valid_to + '</p>';
                     } else {
-                        var big_data = response1.data.big_data || [];
-                        if (big_data.length > 0) {
-                            var valid_to = big_data[0][2];
-                            resultHtml += '<p>Гражданска отговорност до: ' + valid_to + '</p>';
-                        } else {
-                            resultHtml += '<p>Гражданска отговорност до: Няма информация за гражданска отговорност</p>';
-                        }
+                        resultHtml += '<p>Няма данни за валиден технически преглед!</p>';
                     }
+                    resultHtml += '<hr>';
+                } else {
+                    resultHtml += '<h3>Технически преглед</h3>';
+                    resultHtml += '<p>Няма информация за технически преглед</p>';
+                    resultHtml += '<hr>';
+                }
 
-                    // Заявка към второто API - технически преглед
-                    var payload2 = { email: email, plate: plateNumber };
-                    return get_data_from_api('https://myve.bg:4402/check/get/gtp', payload2)
-                        .then(function(response2) {
-                            if (response2.data) {
-                                var technical_inspection_data = response2.data;
-                                var valid_to_match = /валиден до\n\n(\d{2}\.\d{2}\.\d{4})/.exec(technical_inspection_data);
-                                var valid_to = valid_to_match ? valid_to_match[1] : null;
-                                if (valid_to) {
-                                    resultHtml += '<p>Технически преглед до: ' + valid_to + '</p>';
-                                } else {
-                                    resultHtml += '<p>Технически преглед до: Няма данни за валиден технически преглед!</p>';
-                                }
-                            } else {
-                                resultHtml += '<p>Технически преглед до: Няма информация за технически преглед</p>';
-                            }
-
-                            // Заявка към третото API - винетка
-                            var payload3 = { email: email, plate: plateNumber };
-                            return get_data_from_api('https://myve.bg:4402/check/get/vinetka', payload3)
-                                .then(function(response3) {
-                                    if (response3.data === "no info") {
-                                        resultHtml += '<p>Винетка до: Съжаляваме, но не беше открита активна винетка.</p>';
-                                    } else {
-                                        var valid_to = response3.data.valid_to;
-                                        if (valid_to) {
-                                            resultHtml += '<p>Винетка до: ' + valid_to + '</p>';
-                                        } else {
-                                            resultHtml += '<p>Винетка до: Няма информация за винетка</p>';
-                                        }
-                                    }
+                // Заявка към третото API - винетка
+                var payload3 = { email: email, plate: plateNumber };
+                return get_data_from_api('https://myve.bg:4402/check/get/vinetka', payload3)
+                    .then(function(response3) {
+                        resultHtml += '<h3>Винетка</h3>';
+                        if (response3.data === "no info") {
+                            resultHtml += '<p>Съжаляваме, но не беше открита активна винетка.</p>';
+                        } else {
+                            var vinetkaData = response3.data;
+                            resultHtml += '<p>Състояние: ' + vinetkaData.active + '</p>';
+                            resultHtml += '<p>Регистрационен номер: ' + vinetkaData.nomer + '</p>';
+                            resultHtml += '<p>Категория: ' + vinetkaData.category + '</p>';
+                            resultHtml += '<p>Валидна от: ' + vinetkaData.valid_from + '</p>';
+                            resultHtml += '<p>Валидна до: ' + vinetkaData.valid_to + '</p>';
+                            resultHtml += '<p>Цена: ' + vinetkaData.price + '</p>';
+                        }
 
                                     document.getElementById('resultDiv').innerHTML = resultHtml;
                                 });
